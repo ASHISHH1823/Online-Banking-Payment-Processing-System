@@ -38,15 +38,16 @@ public class SecurityConfig {
 		return configuration.getAuthenticationManager();
 	}
 	
+	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		
 		http.csrf(csrf->csrf.disable())
 		.authorizeHttpRequests(req->req.requestMatchers("/auth/**").permitAll()
 				.anyRequest().authenticated()
 				)
-		.httpBasic(Customizer.withDefaults())
-		.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-		.addFilterBefore(null, null);
+		.httpBasic(Customizer.withDefaults());
+		//.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+		
 		return http.build();
 		
 	}
