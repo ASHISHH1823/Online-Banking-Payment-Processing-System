@@ -47,6 +47,7 @@ public class AuthserviceImpl implements AuthService{
 			
 		if(authenticate.isAuthenticated()) {
 			CustomUserDetails customUserDetails= (CustomUserDetails)authenticate.getPrincipal();
+			
 		}
 		return null;
 	}
