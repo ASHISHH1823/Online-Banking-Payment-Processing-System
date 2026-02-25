@@ -17,6 +17,17 @@ public class CustomUserDetails implements UserDetails{
 		super();
 		this.user = user;
 	}
+	
+
+	public Appuser getUser() {
+		return user;
+	}
+
+
+	public void setUser(Appuser user) {
+		this.user = user;
+	}
+
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

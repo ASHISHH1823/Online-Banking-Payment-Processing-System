@@ -14,6 +14,7 @@ import com.ashish.exceptionHandler.UsernameAlredyExistException;
 import com.ashish.repo.AuthRepo;
 import com.ashish.security.CustomUserDetails;
 import com.ashish.service.AuthService;
+import com.ashish.service.JwtService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +25,7 @@ public class AuthserviceImpl implements AuthService{
 	private final AuthRepo authrepo;
 	private final BCryptPasswordEncoder passwordEncoder;
 	private final AuthenticationManager authenticationManager;
+	private final JwtService jwtService;
 	
 
 	@Override
@@ -47,6 +49,12 @@ public class AuthserviceImpl implements AuthService{
 			
 		if(authenticate.isAuthenticated()) {
 			CustomUserDetails customUserDetails= (CustomUserDetails)authenticate.getPrincipal();
+			
+			String token=jwtService.generateToken(customUserDetails.getUser());
+			AuthResponse authResponse = AuthResponse.builder()
+			.token(token)
+			.build();
+			return authResponse;
 		}
 		return null;
 	}
