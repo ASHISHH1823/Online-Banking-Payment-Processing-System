@@ -9,11 +9,13 @@ import java.util.Map;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.ashish.entity.Appuser;
 import com.ashish.service.JwtService;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -56,6 +58,41 @@ public class JwtServiceImpl implements JwtService{
 	private Key getKey() {
 		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
 		return Keys.hmacShaKeyFor(keyBytes);
+	}
+
+	@Override
+	public String extractUsername(String token) {
+		Claims claims=extractAllClaims(token);
+		return claims.getSubject();
+	}
+
+	private Claims extractAllClaims(String token) {
+		Claims claims=Jwts.parser().verifyWith(decryptKey(secretKey))
+		.build()
+		.parseSignedClaims(token)
+		.getPayload();
+		return claims;
+	}
+
+	private SecretKey decryptKey(String secretKey2) {
+		byte[] decode = Decoders.BASE64.decode(secretKey);
+		return Keys.hmacShaKeyFor(decode);
+	}
+
+	@Override
+	public boolean validateToken(String token, UserDetails userDetails) {
+		String username = extractUsername(token);
+		boolean isExpired=isTokenExpired(token);
+		if(username.equalsIgnoreCase(userDetails.getUsername()) && !isExpired) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isTokenExpired(String token) {
+		Claims allClaims = extractAllClaims(token);
+		Date expirationDate = allClaims.getExpiration();
+		return expirationDate.before(new Date());
 	}
 
 }
