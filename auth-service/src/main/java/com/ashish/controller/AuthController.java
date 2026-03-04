@@ -23,15 +23,14 @@ public class AuthController {
 	
 	@PostMapping("/register")
 	public ResponseEntity<String> register(@RequestBody Registerrequest req) throws Exception{
+		System.out.println("Register API hit: " + req.getUsername());
 		authService.register(req);
 		return ResponseEntity.ok("User register Sucessfully!!");	
+		
 	}
 	@PostMapping("/login")
 	public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest){
 		AuthResponse authResponse=authService.login(loginRequest);
-		if(ObjectUtils.isEmpty(authResponse)) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
 		return ResponseEntity.ok(authResponse);
 		
 	}

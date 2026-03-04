@@ -30,6 +30,7 @@ public class AuthserviceImpl implements AuthService{
 
 	@Override
 	public void register(Registerrequest req) throws Exception {
+		System.out.println("Register API called with username: "+req.getUsername() );
 		if(authrepo.existsByUsername(req.getUsername())) {
 			throw new UsernameAlredyExistException("User name Alredy exist!!");
 		}
@@ -39,6 +40,7 @@ public class AuthserviceImpl implements AuthService{
 		.role("ROLE_USER")
 		.build();
 		authrepo.save(appuser);
+		System.out.println("User saved successfully!");
 		
 	}
 

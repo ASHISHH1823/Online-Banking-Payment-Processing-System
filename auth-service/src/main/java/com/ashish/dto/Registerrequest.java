@@ -1,5 +1,6 @@
 package com.ashish.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,8 +10,10 @@ import lombok.Setter;
 @Setter @Getter
 public class Registerrequest {
 	
-	public String username;
-	public String password;
-	public String role;
+	@NotBlank
+	private String username;
+	@NotBlank
+	private String password;
+    private String role;
 
 }
