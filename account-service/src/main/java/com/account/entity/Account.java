@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import lombok.Setter;
 @Setter @Getter
 @AllArgsConstructor @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "accounts")
 public class Account {
 	@Id
@@ -24,7 +26,7 @@ public class Account {
 	
 	private String holderName;
 	
-	private Double amount;
+	private Double balance;
 	@Version
 	private Integer version;
 
