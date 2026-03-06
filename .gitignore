@@ -1,0 +1,22 @@
+# Maven
+target/
+
+# Compiled files
+*.class
+
+# Logs
+*.log
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# IDE files
+.settings/
+.project
+.classpath
+
+# OS files
+.DS_Store
+Thumbs.db
