@@ -1,11 +1,19 @@
 package com.account.service.impl;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.account.Dto.AccountRequest;
 import com.account.Dto.AccountResponse;
 import com.account.entity.Account;
+import com.account.enums.AccountStatus;
 import com.account.exceptionHandler.AccountNotFoundException;
 import com.account.exceptionHandler.AccountalredyExistexception;
 import com.account.repo.AccountRepo;
@@ -30,6 +38,7 @@ public class AccountServiceImpl implements AccountService{
 		Account account = Account.builder()
 		.accountNumber(request.getAccountNumber())
 		.holderName(request.getHolderName())
+		.isActive(AccountStatus.ACTIVE)
 		.balance(request.getBalance())
 		.build();
 		
@@ -42,9 +51,42 @@ public class AccountServiceImpl implements AccountService{
 	@Override
 	public AccountResponse getByAccountNumber(String accNo) {
 		Account account = accountRepo.findByAccountNumber(accNo)
-		.orElseThrow(()->new AccountNotFoundException(accNo));
+		.orElseThrow(()->new AccountNotFoundException("Account not found"));
 		
 		return mapper.map(account, AccountResponse.class);
 	}
+
+	@Override
+	public Page<AccountResponse> getall(int pageNo, int pageSize) {
+		Pageable pageable = PageRequest.of(pageNo, pageSize,Sort.by("id"));
+		Page<Account> page = accountRepo.findAll(pageable);
+		return page.map(account->mapper.map(account, AccountResponse.class));
+	}
+
+	@Override
+	public void inactive(String accNo) {
+		Account account=accountRepo.findByAccountNumber(accNo)
+		.orElseThrow(()-> new AccountNotFoundException("Account not found"));
+		account.setIsActive(AccountStatus.INACTIVE);
+		accountRepo.save(account);
+		log.info("Account deactivated: {}",accNo);
+		
+	}
+
+	@Override
+	public AccountResponse getActiveAccount(String accNo) {
+		Account account = accountRepo.findByAccountNumberAndIsActive(accNo,AccountStatus.ACTIVE)
+				.orElseThrow(()->new AccountNotFoundException("Acctive Account not found"));
+				;		
+		return mapper.map(account, AccountResponse.class);
+	}
+
+	@Override
+	public Page<AccountResponse> getallActiveAccounts(int pageNo, int pageSize) {
+		Pageable pageable = PageRequest.of(pageNo, pageSize,Sort.by("id"));
+		Page<Account> page=accountRepo.findByIsActive(AccountStatus.ACTIVE,pageable);
+		return page.map(account->mapper.map(account, AccountResponse.class));
+	}
+	
 
 }
