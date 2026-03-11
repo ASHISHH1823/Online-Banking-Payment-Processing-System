@@ -12,6 +12,7 @@
         <module>api-gateway</module>
         <module>auth-Service</module>
         <module>account-service</module>
+        <module>Transaction-Service</module>
   </modules>
 
     <parent>
