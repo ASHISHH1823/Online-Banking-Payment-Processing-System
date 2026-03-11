@@ -12,7 +12,11 @@
         <module>api-gateway</module>
         <module>auth-Service</module>
         <module>account-service</module>
+<<<<<<< Transaction-Service
+        <module>transaction-service</module>
+=======
         <module>Transaction-Service</module>
+>>>>>>> dev
   </modules>
 
     <parent>
