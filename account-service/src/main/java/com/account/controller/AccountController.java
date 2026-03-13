@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.account.Dto.AccountRequest;
 import com.account.Dto.AccountResponse;
+import com.account.Dto.BalanceRequest;
+import com.account.Dto.BalanceResponse;
 import com.account.service.AccountService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,24 @@ public class AccountController {
 		AccountResponse accountResponse = accountService.create(Request);
 		return ResponseEntity.ok(accountResponse);	
 	}
+	@PutMapping("/deposit")
+	public ResponseEntity<String> deposit(@RequestBody BalanceRequest request){
+		accountService.deposit(request);
+		return ResponseEntity.ok("Amount deposited successfully");
+	}
+	@PostMapping("/withdraw")
+	public ResponseEntity<String> Withdraw(@RequestBody BalanceRequest req){
+		accountService.withdraw(req);
+		return ResponseEntity.ok("Amount withdrawn successfully");
+		
+	}
+	@GetMapping("/balance/{accNo}")
+	public ResponseEntity<BalanceResponse> CheckBalance(@PathVariable String accNo){
+		return ResponseEntity.ok(accountService.getBalance(accNo));
+		
+	}
+	
+	
 	@GetMapping("/get/{accNo}")
 	public ResponseEntity<AccountResponse> getDetails(@PathVariable String accNo){
 		return ResponseEntity.ok(accountService.getByAccountNumber(accNo));

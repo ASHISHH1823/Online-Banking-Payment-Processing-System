@@ -12,10 +12,13 @@ import org.springframework.stereotype.Service;
 
 import com.account.Dto.AccountRequest;
 import com.account.Dto.AccountResponse;
+import com.account.Dto.BalanceRequest;
+import com.account.Dto.BalanceResponse;
 import com.account.entity.Account;
 import com.account.enums.AccountStatus;
 import com.account.exceptionHandler.AccountNotFoundException;
 import com.account.exceptionHandler.AccountalredyExistexception;
+import com.account.exceptionHandler.InsufficientBalanceException;
 import com.account.repo.AccountRepo;
 import com.account.service.AccountService;
 
@@ -86,6 +89,35 @@ public class AccountServiceImpl implements AccountService{
 		Pageable pageable = PageRequest.of(pageNo, pageSize,Sort.by("id"));
 		Page<Account> page=accountRepo.findByIsActive(AccountStatus.ACTIVE,pageable);
 		return page.map(account->mapper.map(account, AccountResponse.class));
+	}
+
+	@Override
+	public void deposit(BalanceRequest request) {
+		Account account = accountRepo.findByAccountNumber
+				(request.getAccountNumber()).orElseThrow(()->new AccountNotFoundException("Account not found"));
+		account.setBalance(account.getBalance()+request.getAmount());
+		accountRepo.save(account);
+	}
+
+	@Override
+	public void withdraw(BalanceRequest req) {
+		Account account = accountRepo.findByAccountNumber(req.getAccountNumber())
+		.orElseThrow(()->new AccountNotFoundException("Account not found"));
+		
+		if(account.getBalance()<req.getAmount()) {
+			throw new InsufficientBalanceException("Insufficient balance");
+		}
+		account.setBalance(account.getBalance()-req.getAmount());
+		accountRepo.save(account);
+	}
+
+	@Override
+	public BalanceResponse getBalance(String accNo) {
+		Account account = accountRepo.findByAccountNumber(accNo)
+				.orElseThrow(()-> new AccountNotFoundException("Account not found"));
+		return BalanceResponse.builder()
+				.balance(account.getBalance())
+				.build();
 	}
 	
 
