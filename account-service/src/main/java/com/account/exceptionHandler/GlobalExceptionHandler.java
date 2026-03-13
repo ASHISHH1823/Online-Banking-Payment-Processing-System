@@ -17,4 +17,8 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<?> handleAccountNotFoundException(Exception e){
 		return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
 	}
+	@ExceptionHandler(InsufficientBalanceException.class)
+	public ResponseEntity<?> handleInsufficientBalanceException(Exception e){
+		return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+	}
 }
