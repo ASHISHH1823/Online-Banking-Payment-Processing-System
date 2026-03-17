@@ -2,6 +2,8 @@ package com.account.entity;
 
 import com.account.enums.AccountStatus;
 
+import io.micrometer.common.lang.Nullable;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -26,14 +28,17 @@ public class Account {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
+	@Column(unique = true,nullable = false,length = 20)
 	private String accountNumber;
 	
+	@Column(nullable = false)
 	private String holderName;
 	
 	@Enumerated(EnumType.STRING)
 	private AccountStatus isActive;
 	
 	private Double balance;
+	
 	@Version
 	private Integer version;
 
