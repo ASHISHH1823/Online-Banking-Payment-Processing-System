@@ -27,4 +27,8 @@ public interface AccountService {
 
 	BalanceResponse getBalance(String accNo);
 
+	void activate(String accNo);
+
+	void block(String accNo);
+
 }
