@@ -10,11 +10,5 @@ public class AccountRequest {
 	
 	@NotBlank
 	private String holderName;
-	@NotBlank
-	private String accountNumber;
-	@NotNull
-	@Positive
-	private Double balance;
-	
 
 }

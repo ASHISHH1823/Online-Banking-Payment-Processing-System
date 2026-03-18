@@ -1,5 +1,7 @@
 package com.account.entity;
 
+import java.math.BigDecimal;
+
 import com.account.enums.AccountStatus;
 
 import io.micrometer.common.lang.Nullable;
@@ -35,9 +37,10 @@ public class Account {
 	private String holderName;
 	
 	@Enumerated(EnumType.STRING)
+	@Column(name = "is_active")
 	private AccountStatus isActive;
 	
-	private Double balance;
+	private BigDecimal balance;
 	
 	@Version
 	private Integer version;
