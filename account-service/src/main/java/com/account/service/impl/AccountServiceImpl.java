@@ -1,5 +1,6 @@
 package com.account.service.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.account.Dto.AccountRequest;
 import com.account.Dto.AccountResponse;
@@ -38,22 +40,23 @@ public class AccountServiceImpl implements AccountService{
 	
 	@Override
 	public AccountResponse create(AccountRequest request) {
-		if(accountRepo.existsByAccountNumber(request.getAccountNumber())){
-			throw new AccountalredyExistexception("Account already exists");
+		 String accountNumber = accountNumberGenerator.genarate();
+		while(accountRepo.existsByAccountNumber(accountNumber)){
+			accountNumber=accountNumberGenerator.genarate();
 		}
 		Account account = Account.builder()
-		.accountNumber(accountNumberGenerator.genarate())
+		.accountNumber(accountNumber)
 		.holderName(request.getHolderName())
 		.isActive(AccountStatus.ACTIVE)
-		.balance(0.0)
+		.balance(BigDecimal.ZERO)
 		.build();
 		
 		Account saveAccount = accountRepo.save(account);
-		log.info("Account created: {}",request.getAccountNumber());
+		log.info("Account created: {}",accountNumber);
 		
 		return mapper.map(saveAccount, AccountResponse.class);
 	}
-
+    @Transactional(readOnly = true)
 	@Override
 	public AccountResponse getByAccountNumber(String accNo) {
 		Account account = accountRepo.findByAccountNumber(accNo)
@@ -93,7 +96,7 @@ public class AccountServiceImpl implements AccountService{
 		Page<Account> page=accountRepo.findByIsActive(AccountStatus.ACTIVE,pageable);
 		return page.map(account->mapper.map(account, AccountResponse.class));
 	}
-
+    @Transactional
 	@Override
 	public void deposit(BalanceRequest request) {
 		Account account = accountRepo.findByAccountNumber
@@ -102,10 +105,13 @@ public class AccountServiceImpl implements AccountService{
 		if(account.getIsActive()==AccountStatus.INACTIVE) {
 			throw new AccountInactiveException("Account is inactive. Deposit not allowed.");
 		}
-		account.setBalance(account.getBalance()+request.getAmount());
+		if(request.getAmount().compareTo(BigDecimal.ZERO)<=0) {
+			throw new IllegalArgumentException("Amount must be greater than zero");
+		}
+		account.setBalance(account.getBalance().add(request.getAmount()));
 		accountRepo.save(account);
 	}
-
+    @Transactional
 	@Override
 	public void withdraw(BalanceRequest req) {
 		Account account = accountRepo.findByAccountNumber(req.getAccountNumber())
@@ -115,10 +121,10 @@ public class AccountServiceImpl implements AccountService{
 			throw new AccountInactiveException("Account is inactive. Withdrawal not allowed.");
 		}
 		
-		if(account.getBalance()<req.getAmount()) {
+		if(account.getBalance().compareTo(req.getAmount())<0) {
 			throw new InsufficientBalanceException("Insufficient balance");
 		}
-		account.setBalance(account.getBalance()-req.getAmount());
+		account.setBalance(account.getBalance().subtract(req.getAmount()));
 		accountRepo.save(account);
 	}
 
