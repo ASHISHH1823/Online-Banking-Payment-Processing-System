@@ -1,0 +1,16 @@
+server:
+  port: 8080
+  spring:
+  cloud:
+  gateway:
+  routes:
+  -id: auth-service
+  uri: http://auth-service:8085
+  predicates:
+  -path=/auth/**
+  
+  -id: account-service
+  uri: http://account-service:8086
+  predicates:
+  -path=/api/account/**
+  filter:jwtAuthFilter
