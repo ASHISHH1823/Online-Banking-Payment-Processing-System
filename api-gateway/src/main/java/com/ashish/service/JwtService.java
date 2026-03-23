@@ -1,17 +1,20 @@
 package com.ashish.service;
 
+import org.springframework.stereotype.Service;
+
 import com.ashish.exceptionHandler.InvalidTokenException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-
+@Service
 public class JwtService {
-	private final String SECRET="";
+	private final String SECRET="mysecretkey123456";
 
 	public Claims validateToken(String token) {
 		try {
-		return Jwts.parser()
-			.setSigningKey(SECRET)
+		return Jwts.parserBuilder()
+			.setSigningKey(SECRET.getBytes())
+			.build()
 			.parseClaimsJws(token)
 			.getBody();
 		} catch (Exception e) {
