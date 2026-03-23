@@ -2,6 +2,7 @@ package com.account.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -87,13 +88,13 @@ public class AccountController {
 		
 	}
 	@PutMapping("/activate/{accNo}")
-	//@PreAuthorize("hasrole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<String> activate(@PathVariable String accNo){
 		accountService.activate(accNo);
 		return ResponseEntity.ok("Account Activated Sucessfully!!");
 		
 	}
-	//@PreAuthorize("hasrole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/block/{accNo}")
 	public ResponseEntity<String> block(@PathVariable String accNo){
 		accountService.block(accNo);
