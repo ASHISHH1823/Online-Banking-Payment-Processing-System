@@ -23,7 +23,7 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtServiceImpl implements JwtService{
 	
-	private String secretKey="";
+	private String secretKey="mysecretkey123456";
 	
 	
 
