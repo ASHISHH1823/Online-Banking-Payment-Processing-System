@@ -8,7 +8,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 @Service
 public class JwtService {
-	private final String SECRET="mysecretkey123456";
+	private final String SECRET="my-super-secret-key-123456789012345";
 
 	public Claims validateToken(String token) {
 		try {

@@ -15,4 +15,5 @@ spring:
           predicates:
             - Path=/api/account/**
           filters:
-            - JwtAuthFilter
+            - name: JwtAuthFilter   
+              args: {}              
