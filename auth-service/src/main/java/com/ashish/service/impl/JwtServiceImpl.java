@@ -23,21 +23,9 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtServiceImpl implements JwtService{
 	
-	private String secretKey="my-super-secret-key-123456789012345";
+	private final String SECRET="my-super-secret-key-123456789012345";
 	
 	
-
-	public JwtServiceImpl() {
-		try {
-			KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
-			SecretKey sk = keyGen.generateKey();
-			secretKey=Base64.getEncoder().encodeToString(sk.getEncoded());
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-	}
 
 	@Override
 	public String generateToken(Appuser appuser) {
@@ -48,7 +36,7 @@ public class JwtServiceImpl implements JwtService{
 		String token = Jwts.builder().claims().add(claims)
 		.subject(appuser.getUsername())
 		.issuedAt(new Date(System.currentTimeMillis()))
-		.expiration(new Date(System.currentTimeMillis()+60 * 60 * 60 * 10))
+		.expiration(new Date(System.currentTimeMillis()+ 1000 * 60 * 60))
 		.and()
 		.signWith(getKey())
 		.compact();
@@ -56,28 +44,27 @@ public class JwtServiceImpl implements JwtService{
 	}
 
 	private Key getKey() {
-		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-		return Keys.hmacShaKeyFor(keyBytes);
+		return Keys.hmacShaKeyFor(SECRET.getBytes());
+		
 	}
 
 	@Override
 	public String extractUsername(String token) {
-		Claims claims=extractAllClaims(token);
-		return claims.getSubject();
+		return extractAllClaims(token).getSubject();
 	}
 
 	private Claims extractAllClaims(String token) {
-		Claims claims=Jwts.parser().verifyWith(decryptKey(secretKey))
+		Claims claims=Jwts.parser()
+				.verifyWith((javax.crypto.SecretKey)getKey())
 		.build()
 		.parseSignedClaims(token)
 		.getPayload();
 		return claims;
 	}
-
-	private SecretKey decryptKey(String secretKey2) {
-		byte[] decode = Decoders.BASE64.decode(secretKey);
-		return Keys.hmacShaKeyFor(decode);
-	}
+	/*
+	 * private SecretKey decryptKey(String secretKey2) { byte[] decode =
+	 * Decoders.BASE64.decode(secretKey); return Keys.hmacShaKeyFor(decode); }
+	 */
 
 	@Override
 	public boolean validateToken(String token, UserDetails userDetails) {

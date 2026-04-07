@@ -44,29 +44,40 @@ public class JwtAuthFilter extends AbstractGatewayFilterFactory<JwtAuthFilter.Co
                     .getFirst(HttpHeaders.AUTHORIZATION);
 
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                throw new UnauthorizedException("Missing or Invalid Authorization Header");
+            	exchange.getResponse().setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
+               // throw new UnauthorizedException("Missing or Invalid Authorization Header");
+            	return exchange.getResponse().setComplete();
             }
 
             String token = authHeader.substring(7);
-
-            Claims claims = jwtService.validateToken(token);
-            String role = jwtService.extractRole(claims);
-            String username = claims.getSubject();
-            
-            exchange = exchange.mutate()
-                    .request(exchange.getRequest().mutate()
-                            .header("User", username)
-                            .header("Role", role)
-                            .build())
-                    .build();
-            List<String> adminPaths =List.of("/active","/block");
-            if (adminPaths.stream().anyMatch(path::contains)) {
-				if (!"ROLE_ADMIN".equals(role)) {
-					throw new AccessDeniedException("ADMIN only");
-				}
+try {
+	 Claims claims = jwtService.validateToken(token);
+     String role = jwtService.extractRole(claims);
+     String username = claims.getSubject();
+     
+     exchange = exchange.mutate()
+             .request(exchange.getRequest().mutate()
+             		.header(HttpHeaders.AUTHORIZATION, authHeader)
+                     .header("User", username)
+                     .header("Role", role)
+                     .build())
+             .build();
+     List<String> adminPaths =List.of("/active","/block");
+     if (adminPaths.stream().anyMatch(path::contains)) {
+			if (!"ROLE_ADMIN".equals(role)) {
+				//throw new AccessDeniedException("ADMIN only");
+				 exchange.getResponse().setStatusCode(org.springframework.http.HttpStatus.FORBIDDEN);
+				    return exchange.getResponse().setComplete();
 			}
+		}
 
-            return chain.filter(exchange);
+     return chain.filter(exchange);
+} catch (Exception e) {
+	 e.printStackTrace(); 
+     exchange.getResponse().setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
+     return exchange.getResponse().setComplete();
+}
+           
         };
     }
 }
